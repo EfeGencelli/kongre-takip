@@ -60,10 +60,9 @@ def tickers_needed():
     return sorted({BENCH} | {r["t"] for r in rows if _valid(r["t"])})
 
 
-def sync(stop=None, limit=4000, extra=()):
-    """Kapanışları 12 saatten eski olanları yeniler. Dönen: (yenilenen, toplam istenen).
-    `extra`: başka modüllerin istediği semboller (ör. 13F fon hareketleri)."""
-    want = sorted(set(tickers_needed()) | {t.upper() for t in extra if _valid((t or "").upper())})
+def sync(stop=None, limit=4000):
+    """Kapanışları 12 saatten eski olanları yeniler. Dönen: (yenilenen, toplam istenen)."""
+    want = tickers_needed()
     fresh = {r["ticker"] for r in db.query("SELECT ticker FROM price_hist WHERE updated>=?",
                                            (time.time() - REFRESH_SECONDS,))}
     todo = [t for t in want if t not in fresh][:limit]
@@ -130,14 +129,14 @@ def _end_day(start, horizon):
     return (date.fromisoformat(start) + timedelta(days=int(horizon))).isoformat()
 
 
-def perf(ticker, start, horizon=None, start_price=None):
+def perf(ticker, start, horizon=None):
     """İşlem gününden bugüne (ya da `horizon` gün sonrasına) hisse ve SPY getirisi (%).
 
     Dönen: {"ret", "spy", "excess", "days"} ya da None (veri yoksa / süre dolmadıysa)."""
     if not ticker or not start:
         return None
-    start = start[:10]   # bazı Form 4 tarihleri saat dilimiyle gelir: 2026-11-19-05:00
-    p0 = start_price or close_on(ticker, start)
+    start = start[:10]   # yalnızca tarih kısmı (YYYY-AA-GG)
+    p0 = close_on(ticker, start)
     s0 = close_on(BENCH, start)
     if not p0 or not s0:
         return None
@@ -158,14 +157,12 @@ def perf(ticker, start, horizon=None, start_price=None):
     return {"ret": round(ret, 2), "spy": round(spy, 2), "excess": round(ret - spy, 2), "days": days}
 
 
-def attach(rows, ticker_key="ticker", date_key="tx_date", price_key=None, horizon=None, suffix=""):
-    """Satırlara ret / spy_ret / excess alanlarını (sonlarına `suffix` eklenerek) yerinde ekler."""
-    preload([BENCH] + [r.get(ticker_key) or "" for r in rows])
+def attach(rows, horizon=None):
+    """Satırlara ret / spy_ret / excess alanlarını yerinde ekler."""
+    preload([BENCH] + [r.get("ticker") or "" for r in rows])
     for r in rows:
-        p = perf(r.get(ticker_key), r.get(date_key), horizon,
-                 start_price=r.get(price_key) if price_key else None)
-        r["ret" + suffix], r["spy_ret" + suffix], r["excess" + suffix] = \
-            (p["ret"], p["spy"], p["excess"]) if p else (None, None, None)
+        p = perf(r.get("ticker"), r.get("tx_date"), horizon)
+        r["ret"], r["spy_ret"], r["excess"] = (p["ret"], p["spy"], p["excess"]) if p else (None, None, None)
     return rows
 
 

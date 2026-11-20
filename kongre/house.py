@@ -191,7 +191,7 @@ def _house_index(year):
 
 
 def sync_house(stop=None, max_docs=600, pause=0.25):
-    """Yeni House PTR'lerini indirir ve ayrıştırır. Dönen: yeni işlemler (bildirim için)."""
+    """Yeni House PTR'lerini indirir ve ayrıştırır. Dönen: (yeni işlemler, okunmayı bekleyen rapor sayısı)."""
     years = [date.today().year]
     if date.today().month <= 2:
         years.insert(0, date.today().year - 1)   # yıl başında geçen yılın son raporları da gelir
@@ -238,22 +238,6 @@ def sync_house(stop=None, max_docs=600, pause=0.25):
                              "owner", "asset", "asset_type", "ticker", "type", "partial", "amount", "amt_lo", "amt_hi",
                              "url"), r)) for r in rows]
     return new_tx, len(todo) - processed
-
-
-PTR_URL_RE = re.compile(r"^(https://disclosures-clerk\.house\.gov/public_disc/ptr-pdfs/\d{4}/\d+\.pdf"
-                        r"|https://extapps2\.oge\.gov/201/Presiden\.nsf/PAS\+Index/[0-9A-F]+/\$FILE/[^?#]+\.pdf)$")
-
-
-def is_ptr_url(url):
-    return bool(PTR_URL_RE.match(url or ""))
-
-
-def fetch_pdf(url):
-    if not is_ptr_url(url):
-        raise ValueError("Geçersiz rapor adresi")
-    r = requests.get(url, headers=UA, timeout=60)
-    r.raise_for_status()
-    return r.content
 
 
 def sync(stop=None):

@@ -4,7 +4,9 @@ import os
 from datetime import date, timedelta
 from pathlib import Path
 
-from flask import Flask, jsonify, request, send_from_directory
+from urllib.parse import urlsplit
+
+from flask import Flask, abort, jsonify, request, send_from_directory
 
 from kongre import db, returns, sync
 
@@ -36,9 +38,58 @@ def _since(days):
     return (date.today() - timedelta(days=int(days))).isoformat()
 
 
+def _num_arg(name, default, lo, hi, kind=int):
+    """Adres satırındaki sayı: boşsa varsayılan, sayı değilse 400, sınır dışındaysa sınıra çekilir."""
+    raw = request.args.get(name, "").strip()
+    if not raw:
+        return default
+    try:
+        v = kind(raw)
+    except (ValueError, OverflowError):
+        abort(400, f"{name} sayı olmalı")
+    if v != v:   # NaN
+        abort(400, f"{name} sayı olmalı")
+    return max(lo, min(hi, v))
+
+
 def _horizon():
-    h = request.args.get("horizon", "")
-    return int(h) if h.isdigit() else None
+    return _num_arg("horizon", None, 1, 3650)
+
+
+# ---------------------------------------------------------------- yalnızca bu bilgisayardan erişim
+
+LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1"}
+
+
+def _is_local(netloc):
+    try:
+        return urlsplit("//" + netloc).hostname in LOCAL_HOSTS
+    except ValueError:
+        return False
+
+
+@app.before_request
+def _only_local():
+    """Uygulama yalnızca bu bilgisayardaki tarayıcı içindir.
+
+    Host denetimi: başka bir alan adının bu sunucuya yönlendirilmesini (DNS rebinding) engeller.
+    Origin denetimi: açık duran başka bir sitenin kullanıcı adına istek göndermesini (CSRF) engeller."""
+    if not _is_local(request.host):
+        abort(403)
+    if request.method not in ("GET", "HEAD", "OPTIONS"):
+        origin = request.headers.get("Origin")
+        if origin is not None and not _is_local(urlsplit(origin).netloc):
+            abort(403)
+        if request.headers.get("Sec-Fetch-Site") in ("cross-site", "same-site"):
+            abort(403)
+
+
+@app.after_request
+def _security_headers(resp):
+    resp.headers.setdefault("Content-Security-Policy", "default-src 'self'; frame-ancestors 'none'")
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("Referrer-Policy", "no-referrer")
+    return resp
 
 
 @app.get("/")
@@ -54,11 +105,11 @@ def api_status():
 
 @app.get("/api/trades")
 def api_trades():
-    days = int(request.args.get("days", 30))
+    days = _num_arg("days", 30, 1, 3650)
     kind = request.args.get("type", "PS")          # PS: alım+satım, P, S, E (takas), all
     assets = request.args.get("assets", "stocks")  # stocks: hisse, ETF, opsiyon · all: tahvil vb. dahil
     party = request.args.get("party", "")
-    min_value = float(request.args.get("min", 0) or 0)
+    min_value = _num_arg("min", 0, 0, 1e12, kind=float)
     q = request.args.get("q", "").strip()
     view = request.args.get("view", "list")
 
@@ -115,7 +166,7 @@ def api_trades():
 @app.get("/api/scorecard")
 def api_scorecard():
     """"Piyasayı yendi mi?": hisse/ETF alım-satımlarının işlemden sonra S&P 500'e göre performansı."""
-    days = int(request.args.get("days", 90))
+    days = _num_arg("days", 90, 1, 3650)
     where, args = "tx_date>=? AND asset_type IN ('ST','EF') AND type IN ('P','S') AND ticker IS NOT NULL", [_since(days)]
     if request.args.get("famous") == "1":
         f_sql, f_args = _famous_sql("member")
@@ -127,7 +178,7 @@ def api_scorecard():
     party = request.args.get("party", "")
     if party in ("D", "R", "I"):
         rows = [r for r in rows if r.get("party") == party]
-    members, summary = returns.scorecard(rows, min_trades=int(request.args.get("min_trades", 3)))
+    members, summary = returns.scorecard(rows, min_trades=_num_arg("min_trades", 3, 1, 10000))
     fam = _famous()
     for m in members:
         m["famous"] = _is_famous(m["member"], fam)
@@ -137,7 +188,7 @@ def api_scorecard():
 
 @app.get("/api/reports")
 def api_reports():
-    days = int(request.args.get("days", 30))
+    days = _num_arg("days", 30, 1, 3650)
     return jsonify(db.query("SELECT * FROM congress_docs WHERE filed>=? ORDER BY filed DESC, id DESC LIMIT 1000",
                             (_since(days),)))
 

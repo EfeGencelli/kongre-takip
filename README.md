@@ -39,6 +39,9 @@ Sonra saatte bir kendiliğinden güncellenir. Yalnızca veriyi güncellemek içi
 
 macOS dışında `./ocr/derle.sh` çalışmaz; uygulama Başkanın raporlarını atlar, Meclis kısmı aynen çalışır.
 
+> **Yalnızca kendi bilgisayarınızda çalıştırın.** Uygulama kişisel kullanım için yazıldı: yalnızca `localhost`
+> üzerinden erişilir, giriş ekranı ya da kullanıcı hesabı yoktur. İnternete açık bir sunucuya kurmayın.
+
 ### Yapay zeka asistanıyla kurulum
 
 Depoda bir Claude Code skill'i var (`.claude/skills/kongre-takip/SKILL.md`). Depoyu indirip klasörde Claude Code'a
