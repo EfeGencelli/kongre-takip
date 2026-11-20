@@ -1,4 +1,4 @@
-"""Kongre Takip: yerel web arayüzü.  python app.py  →  http://localhost:5060"""
+"""Kongre Takip: yerel web arayüzü.  python app.py  →  http://localhost:8765"""
 import json
 import os
 from datetime import date, timedelta
@@ -205,6 +205,7 @@ if __name__ == "__main__":
     db.init()
     if not os.environ.get("KONGRE_GUNCELLEME_YOK"):
         sync.start_background(int(os.environ.get("KONGRE_DAKIKA", 60)))
-    port = int(os.environ.get("KONGRE_PORT", 5060))
+    # 5060/5061 gibi kapılar Chrome'un yasaklı listesinde (ERR_UNSAFE_PORT); 8765 güvenli
+    port = int(os.environ.get("KONGRE_PORT", 8765))
     print(f"\n  Kongre Takip:  http://localhost:{port}\n  İlk güncelleme birkaç dakika sürer; sayfa veriler geldikçe dolar.\n")
     app.run(host="127.0.0.1", port=port, debug=False, threaded=True)

@@ -31,11 +31,14 @@ git clone <bu depo> && cd kongre-takip
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 ./ocr/derle.sh          # yalnızca macOS: Başkanın raporlarını okumak için (Xcode komut satırı araçları gerekir)
-python app.py           # http://localhost:5060
+python app.py           # http://localhost:8765
 ```
 
 İlk açılışta veriler toplanır (Meclis birkaç dakika, Başkanın raporları ilk seferde 30–60 dakika); sayfa veri geldikçe dolar.
 Sonra saatte bir kendiliğinden güncellenir. Yalnızca veriyi güncellemek için: `python -m kongre.sync`.
+
+Sayfa açılmazsa (ör. `ERR_UNSAFE_PORT`): `KONGRE_PORT` ile başka bir kapı seçin; 5060, 5061, 6000 gibi kapıları
+Chrome güvenlik gereği açmaz.
 
 macOS dışında `./ocr/derle.sh` çalışmaz; uygulama Başkanın raporlarını atlar, Meclis kısmı aynen çalışır.
 
@@ -51,7 +54,7 @@ yanıtlama adımları orada yazılı. Skill yalnızca bu klasörde çalışır.
 ### Ayarlar (isteğe bağlı)
 
 - `KONGRE_SEC_UA="Ad Soyad eposta@ornek.com"`: SEC, otomatik isteklerde iletişim bilgisi ister (şirket listesi için).
-- `KONGRE_PORT` (varsayılan 5060), `KONGRE_VERI` (veri klasörü, varsayılan `./veri`), `KONGRE_DAKIKA` (güncelleme aralığı).
+- `KONGRE_PORT` (varsayılan 8765), `KONGRE_VERI` (veri klasörü, varsayılan `./veri`), `KONGRE_DAKIKA` (güncelleme aralığı).
 - Ünlüler listesi: `ayarlar.ornek.json` dosyasını `ayarlar.json` adıyla kopyalayıp düzenleyin.
 
 ## Hesap nasıl yapılıyor
