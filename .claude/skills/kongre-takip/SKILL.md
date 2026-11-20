@@ -27,7 +27,7 @@ kaynaklardan çeker (House Clerk, OGE, SEC, Yahoo). Hiçbir hesap, API anahtarı
 ```
 
 Ardından kullanıcıya http://localhost:5060 adresini aç / ver. İlk açılışta veri toplanır (Meclis birkaç dakika,
-Başkanın raporları 10–20 dakika); sayfa kendiliğinden dolar. Sunucu açık kaldıkça saatte bir güncellenir.
+Başkanın raporları ilk seferde 30–60 dakika); sayfa kendiliğinden dolar. Sunucu açık kaldıkça saatte bir güncellenir.
 Sunucuyu arka planda başlatıyorsan kullanıcıya nasıl durduracağını söyle.
 
 Yalnızca veriyi güncellemek: `./venv/bin/python -m kongre.sync`

@@ -34,7 +34,7 @@ pip install -r requirements.txt
 python app.py           # http://localhost:5060
 ```
 
-İlk açılışta veriler toplanır (Meclis birkaç dakika, Başkanın raporları 10–20 dakika); sayfa veri geldikçe dolar.
+İlk açılışta veriler toplanır (Meclis birkaç dakika, Başkanın raporları ilk seferde 30–60 dakika); sayfa veri geldikçe dolar.
 Sonra saatte bir kendiliğinden güncellenir. Yalnızca veriyi güncellemek için: `python -m kongre.sync`.
 
 macOS dışında `./ocr/derle.sh` çalışmaz; uygulama Başkanın raporlarını atlar, Meclis kısmı aynen çalışır.
