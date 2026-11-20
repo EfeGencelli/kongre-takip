@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kongre Takip</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/static/style.css?v=1">
+</head>
+<body>
+  <header>
+    <div>
+      <div class="kicker">ABD · STOCK Act ve OGE işlem raporları</div>
+      <h1>Kongre Takip</h1>
+    </div>
+    <div class="status" id="status"></div>
+  </header>
+
+  <nav class="views" id="views">
+    <button data-view="list" class="on">Son işlemler</button>
+    <button data-view="score">Piyasayı yendi mi?</button>
+    <button data-view="ticker">Hisse bazında</button>
+    <button data-view="member">Üye bazında</button>
+    <button data-view="docs">Raporlar</button>
+  </nav>
+
+  <div class="toolbar">
+    <div class="chips" data-chips="party">
+      <button data-v="" class="on">Tüm partiler</button><button data-v="D">Demokrat</button><button data-v="R">Cumhuriyetçi</button>
+    </div>
+    <div class="chips" data-chips="days">
+      <button data-v="7">7 gün</button><button data-v="30" class="on">30 gün</button><button data-v="90">90 gün</button><button data-v="365">1 yıl</button>
+    </div>
+    <select id="f-type">
+      <option value="PS">Alım ve satım</option><option value="P">Alımlar</option><option value="S">Satışlar</option><option value="all">Hepsi</option>
+    </select>
+    <select id="f-min">
+      <option value="0">Her tutar</option><option value="15001">≥ $15K</option><option value="50001">≥ $50K</option>
+      <option value="100001">≥ $100K</option><option value="250001">≥ $250K</option><option value="1000001">≥ $1M</option>
+    </select>
+    <select id="f-horizon" title="Getiri işlem gününden hangi tarihe kadar ölçülsün">
+      <option value="">Getiri: bugüne kadar</option><option value="30">30 gün sonra</option><option value="90">90 gün sonra</option><option value="180">180 gün sonra</option>
+    </select>
+    <label class="check"><input type="checkbox" id="f-famous"> ★ Ünlüler</label>
+    <label class="check" title="Devlet ve belediye tahvilleri, fonlar vb."><input type="checkbox" id="f-all"> Tahvil ve diğerleri</label>
+    <input type="search" id="f-q" placeholder="Üye, sembol veya varlık…">
+    <span class="count" id="count"></span>
+  </div>
+
+  <main id="out"><div class="empty">Yükleniyor…</div></main>
+
+  <footer>
+    Kaynaklar: Temsilciler Meclisi periyodik işlem raporları (disclosures-clerk.house.gov) ve Başkanın OGE 278-T raporları
+    (oge.gov, taranmış; metin tanımayla okunur). Tutarlar aralık olarak bildirilir; işlemler 45 güne kadar gecikmeli gelebilir.
+    Getiri, işlem günü kapanışından (Yahoo, düzeltilmiş) ölçülür. Yatırım tavsiyesi değildir.
+  </footer>
+  <script src="/static/app.js?v=1"></script>
+</body>
+</html>

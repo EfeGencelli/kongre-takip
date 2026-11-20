@@ -1,0 +1,7 @@
+veri/
+bin/
+venv/
+__pycache__/
+*.pyc
+ayarlar.json
+.DS_Store
