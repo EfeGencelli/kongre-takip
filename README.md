@@ -3,6 +3,8 @@
 ABD Temsilciler Meclisi üyelerinin ve Başkanın hisse işlemlerini resmi kaynaklardan toplar. İşlemden sonra
 hissenin S&P 500'e göre ne yaptığını hesaplar: **"Politikacılar piyasayı yeniyor mu?"**
 
+![Kongre Takip: "Piyasayı yendi mi?" karnesi; parti ve kişi bazında S&P 500'e göre fark](docs/ekran-goruntusu.png)
+
 - **Son işlemler:** kim, neyi, ne zaman, hangi tutar aralığında aldı/sattı; kaç gün geç bildirdi; o günden bu yana
   hisse ve S&P 500 getirisi.
 - **Piyasayı yendi mi?:** kişi ve parti bazında karne (alım farkı, satış zamanlaması, isabet oranı).
